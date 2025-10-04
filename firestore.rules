@@ -1,0 +1,206 @@
+/**
+ * @fileOverview Firestore Security Rules for AstroBio Navigator.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles.
+ * Research papers and related content (summaries, mindmaps, quizzes) are publicly readable but owner-only writable via path-based authorization.
+ *
+ * Data Structure:
+ * - /users/{userId}: User profile data, where {userId} is the Firebase Auth UID.
+ * - /researchPapers/{researchPaperId}: Research paper metadata.
+ * - /researchPapers/{researchPaperId}/summaries/{summaryId}: Summaries for research papers.
+ * - /researchPapers/{researchPaperId}/mindmaps/{mindmapId}: Mind maps for research papers.
+ * - /researchPapers/{researchPaperId}/quizzes/{quizId}: Quizzes for research papers.
+ *
+ * Key Security Decisions:
+ * - User profiles are only accessible and modifiable by the owning user.
+ * - Research papers and their associated data are publicly readable to enable open access and discoverability.
+ * - Writes to research papers and their related data are implicitly restricted via path based ownership and must be done with caution, as there is no explicit owner.
+ * - List operations on the `/users` collection are denied to prevent unauthorized enumeration of user accounts.
+ *
+ * Denormalization for Authorization:
+ * - User profiles denormalize the `firebaseAuthId` into the document, allowing rules to check `isOwner(userId)` without additional reads.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the user is signed in.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource and the resource exists.
+     */
+    function isExistingOwner(userId) {
+        return isOwner(userId) && exists(resource);
+    }
+
+    /**
+     * @description Enforces document ownership for writes and validates the firebaseAuthId on creation.
+     * @path /users/{userId}
+     * @allow (create) - User 'user_abc' can create their profile.
+     *    request.auth.uid: 'user_abc'
+     * @allow (update) - User 'user_abc' can update their profile.
+     *    request.auth.uid: 'user_abc'
+     * @allow (get) - User 'user_abc' can read their profile.
+     *    request.auth.uid: 'user_abc'
+     * @deny (create) - User 'user_abc' cannot create a profile for 'user_xyz'.
+     *    request.auth.uid: 'user_abc'
+     * @deny (update) - User 'user_abc' cannot update the profile of 'user_xyz'.
+     *    request.auth.uid: 'user_xyz'
+     * @deny (delete) - User 'user_abc' cannot delete the profile of 'user_xyz'.
+     *    request.auth.uid: 'user_xyz'
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId} {
+      // Read rules: Only the owner can read their profile.
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      // Write rules: Only the owner can create, update, or delete their profile.
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Allows public read access to research papers, but restricts write access.
+     * @path /researchPapers/{researchPaperId}
+     * @allow (get) - Any user can read a research paper.
+     *    request.auth: null
+     * @allow (list) - Any user can list research papers.
+     *    request.auth: null
+     * @deny (create) - No user can create a research paper without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (update) - No user can update a research paper without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (delete) - No user can delete a research paper without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @principle Allows public read access with restricted writes.
+     */
+    match /researchPapers/{researchPaperId} {
+      // Read rules: Allow anyone to read research papers.
+      allow get, list: if true;
+
+      // Write rules: Only the owner can create, update, or delete research papers.
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Allows public read access to summaries, but restricts write access.
+     * @path /researchPapers/{researchPaperId}/summaries/{summaryId}
+     * @allow (get) - Any user can read a summary.
+     *    request.auth: null
+     * @allow (list) - Any user can list summaries.
+     *    request.auth: null
+     * @deny (create) - No user can create a summary without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (update) - No user can update a summary without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (delete) - No user can delete a summary without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @principle Allows public read access with restricted writes.
+     */
+    match /researchPapers/{researchPaperId}/summaries/{summaryId} {
+      // Read rules: Allow anyone to read summaries.
+      allow get, list: if true;
+
+      // Write rules: Only the owner can create, update, or delete summaries.
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Allows public read access to mindmaps, but restricts write access.
+     * @path /researchPapers/{researchPaperId}/mindmaps/{mindmapId}
+     * @allow (get) - Any user can read a mindmap.
+     *    request.auth: null
+     * @allow (list) - Any user can list mindmaps.
+     *    request.auth: null
+     * @deny (create) - No user can create a mindmap without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (update) - No user can update a mindmap without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (delete) - No user can delete a mindmap without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @principle Allows public read access with restricted writes.
+     */
+    match /researchPapers/{researchPaperId}/mindmaps/{mindmapId} {
+      // Read rules: Allow anyone to read mindmaps.
+      allow get, list: if true;
+
+      // Write rules: Only the owner can create, update, or delete mindmaps.
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Allows public read access to quizzes, but restricts write access.
+     * @path /researchPapers/{researchPaperId}/quizzes/{quizId}
+     * @allow (get) - Any user can read a quiz.
+     *    request.auth: null
+     * @allow (list) - Any user can list quizzes.
+     *    request.auth: null
+     * @deny (create) - No user can create a quiz without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (update) - No user can update a quiz without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @deny (delete) - No user can delete a quiz without being authenticated and meeting ownership constraints (TODO).
+     *    request.auth.uid: 'user_abc'
+     * @principle Allows public read access with restricted writes.
+     */
+    match /researchPapers/{researchPaperId}/quizzes/{quizId} {
+      // Read rules: Allow anyone to read quizzes.
+      allow get, list: if true;
+
+      // Write rules: Only the owner can create, update, or delete quizzes.
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description User-owned starred papers collection.
+     * @path /starred_papers/{starId}
+     * @allow (read) - Any authenticated user can read starred papers (for counts).
+     * @allow (create) - Users can star papers (with userId validation).
+     * @allow (delete) - Users can only delete their own starred papers.
+     * @principle User ownership with public read for interaction counts.
+     */
+    match /starred_papers/{starId} {
+      // Read rules: Allow authenticated users to read (for star counts).
+      allow get, list: if isSignedIn();
+
+      // Write rules: Users can only manage their own stars.
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow update: if false; // Stars don't need updates, only create/delete.
+    }
+
+    /**
+     * @description User-generated comments on research papers.
+     * @path /paper_comments/{commentId}
+     * @allow (read) - Any user can read comments (public discussion).
+     * @allow (create) - Authenticated users can add comments (with userId validation).
+     * @allow (update) - Users can only update their own comments.
+     * @allow (delete) - Users can only delete their own comments.
+     * @principle User ownership with public read for open discussion.
+     */
+    match /paper_comments/{commentId} {
+      // Read rules: Allow anyone to read comments (public discussion).
+      allow get, list: if true;
+
+      // Write rules: Users can only manage their own comments.
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+  }
+}

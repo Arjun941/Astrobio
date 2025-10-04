@@ -1,0 +1,34 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "Abstract image of a nebula or galaxy, evoking a sense of space and discovery.",
+      "imageUrl": "https://images.unsplash.com/photo-1677357623576-7c8aab08da22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxnYWxheHklMjBuZWJ1bGF8ZW58MHx8fHwxNzU5NTExMDA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "galaxy nebula"
+    },
+    {
+      "id": "paper-card-1",
+      "description": "Abstract image representing planetary science.",
+      "imageUrl": "https://images.unsplash.com/photo-1610497885882-846f87b2ea6c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwbGFuZXQlMjBhYnN0cmFjdHxlbnwwfHx8fDE3NTk1NzA4Mzl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "planet abstract"
+    },
+    {
+      "id": "paper-card-2",
+      "description": "Abstract image representing cellular biology.",
+      "imageUrl": "https://images.unsplash.com/photo-1754149614172-69db44448bd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxiaW9sb2d5JTIwY2VsbHN8ZW58MHx8fHwxNzU5NDk5MzY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology cells"
+    },
+    {
+      "id": "paper-card-3",
+      "description": "Abstract image representing extraterrestrial intelligence.",
+      "imageUrl": "https://images.unsplash.com/photo-1548244250-9aa08b58f204?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGFjZSUyMHNpZ25hbHN8ZW58MHx8fHwxNzU5NTcwODM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "space signals"
+    },
+    {
+      "id": "paper-card-4",
+      "description": "Abstract image representing the planet Mars.",
+      "imageUrl": "https://images.unsplash.com/photo-1517461403273-99cbad26cc34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtYXJzJTIwcGxhbmV0fGVufDB8fHx8MTc1OTQ5NTI4MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mars planet"
+    }
+  ]
+}
