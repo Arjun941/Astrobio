@@ -11,32 +11,32 @@ import { StarsBackground } from '@/components/ui/stars-background';
 const features = [
   {
     icon: <BookOpen className="w-6 h-6" />,
-    title: 'AI Summaries',
-    description: 'Get personalized summaries for any expertise level, from beginner to expert.',
+    title: 'AI Research Summaries',
+    description: 'Get clear summaries of space biology experiments and their impacts on human exploration.',
   },
   {
     icon: <BrainCircuit className="w-6 h-6" />,
-    title: 'Interactive Mindmaps',
-    description: 'Visualize complex concepts and their relationships with dynamic mindmaps.',
+    title: 'Interactive Knowledge Maps',
+    description: 'Visualize connections between space biology research and mission planning insights.',
   },
   {
     icon: <AudioWaveform className="w-6 h-6" />,
     title: 'Audio Narration',
-    description: 'Listen to research papers on the go with high-quality text-to-speech.',
+    description: 'Listen to space biology research findings on the go with AI-generated narrations.',
   },
   {
     icon: <MessageCircle className="w-6 h-6" />,
-    title: 'Contextual Chatbot',
-    description: 'Ask questions and get instant, context-aware answers about the paper.',
+    title: 'Space Biology Chatbot',
+    description: 'Ask questions about how life responds to space environments and get expert answers.',
   },
   {
     icon: <FileQuestion className="w-6 h-6" />,
-    title: 'Generated Quizzes',
-    description: 'Test your understanding with AI-generated multiple-choice questions.',
+    title: 'Knowledge Quizzes',
+    description: 'Test your understanding of space biology concepts with AI-generated questions.',
   },
   {
     icon: <Upload className="w-6 h-6" />,
-    title: 'PDF Cross-Reference',
+    title: 'AI Reference',
     description: 'Upload your research PDFs and discover related papers, citations, and cross-references using AI.',
   },
 ];
@@ -81,10 +81,10 @@ export default function Home() {
                 damping: 15
               }}
             >
-              AstroBio Navigator
+              AstroBio Engine
             </motion.h1>
             <motion.p 
-              className="mt-4 max-w-3xl mx-auto text-xl md:text-2xl lg:text-3xl text-muted-foreground"
+              className="mt-4 max-w-4xl mx-auto text-xl md:text-2xl lg:text-3xl text-muted-foreground"
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ 
@@ -96,7 +96,7 @@ export default function Home() {
                 damping: 20
               }}
             >
-              Unlock the secrets of space biology. Your AI-powered guide to complex research papers with interactive summaries and insights.
+              Your space biology knowledge engine. Explore 600+ scientific publications to understand how life responds to space environments with AI-powered insights.
             </motion.p>
             <motion.div 
               className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -149,7 +149,7 @@ export default function Home() {
                 <Button asChild variant="outline" size="lg" className="border-accent/30 hover:border-accent hover:bg-accent/10 hover:text-accent text-foreground group relative overflow-hidden transition-all duration-300">
                   <Link href="/upload" className="inline-flex items-center px-6 py-3">
                     <Upload className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                    <span className="font-semibold transition-colors duration-300">Upload PDF</span>
+                    <span className="font-semibold transition-colors duration-300">Find Related Papers</span>
                   </Link>
                 </Button>
               </motion.div>
@@ -219,10 +219,10 @@ export default function Home() {
               viewport={{ once: true }}
             >
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Simplifying Complex Science
+                Enabling Future Space Exploration
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-                We use cutting-edge AI to make dense scientific literature accessible to everyone.
+              <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                Discover how humans, plants, and living systems respond to space environments. Our AI-powered platform helps researchers, mission planners, and explorers understand decades of space biology research.
               </p>
             </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
@@ -270,6 +270,66 @@ export default function Home() {
             <div className="absolute inset-0 pointer-events-none" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322c55e' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }} />
+          </div>
+        </section>
+
+        {/* Space Biology Knowledge Section */}
+        <section className="w-full py-16 md:py-24 bg-background relative">
+          <div className="container mx-auto px-4 md:px-6">
+            <motion.div 
+              className="max-w-4xl mx-auto text-center mb-12"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Supporting Human Space Exploration
+              </h2>
+              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+                <p>
+                  As humanity prepares to return to the Moon and explore Mars, understanding how living systems respond to space environments becomes crucial. Decades of biological experiments in space have generated valuable insights for future missions.
+                </p>
+                <p>
+                  Our platform leverages artificial intelligence to organize and summarize over 600 bioscience publications, making this wealth of space biology knowledge accessible to researchers, mission planners, and anyone interested in space exploration.
+                </p>
+                <p className="text-accent font-medium">
+                  Discover scientific breakthroughs • Identify research gaps • Find actionable insights for mission planning
+                </p>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-accent/10 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-8 h-8 text-accent" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">600+ Publications</h3>
+                <p className="text-muted-foreground">Bioscience research papers spanning decades of space experiments</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-accent/10 rounded-full flex items-center justify-center">
+                  <BrainCircuit className="w-8 h-8 text-accent" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">AI-Powered Insights</h3>
+                <p className="text-muted-foreground">Advanced AI summarization and knowledge extraction from complex research</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-accent/10 rounded-full flex items-center justify-center">
+                  <Search className="w-8 h-8 text-accent" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Mission Ready</h3>
+                <p className="text-muted-foreground">Actionable information for planning safe and efficient space missions</p>
+              </div>
+            </motion.div>
           </div>
         </section>
       </main>
