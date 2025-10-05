@@ -7,6 +7,7 @@ export interface Paper {
   content: string;
   pdfLink: string;
   images?: string;
+  authors?: string;
 }
 
 // Google Sheets CSV URL - converted from the sharing link
@@ -21,6 +22,9 @@ let cachedPapers: Paper[] | null = null;
  * Fetches papers data from Google Sheets CSV
  */
 export async function fetchPapersData(): Promise<Paper[]> {
+  // Clear cache to force refresh for author data
+  cachedPapers = null;
+  
   if (cachedPapers) {
     return cachedPapers;
   }
@@ -56,7 +60,11 @@ export async function fetchPapersData(): Promise<Paper[]> {
             'Image': 'images',
             'Images': 'images',
             'image': 'images',
-            'images': 'images'
+            'images': 'images',
+            'Author': 'authors',
+            'Authors': 'authors',
+            'author': 'authors',
+            'authors': 'authors'
           };
           return headerMap[header] || header.toLowerCase();
         },
@@ -76,12 +84,19 @@ export async function fetchPapersData(): Promise<Paper[]> {
                 link: row.link || '',
                 content: row.content || '',
                 pdfLink: row.pdfLink || row['PDF Link'] || row.pdflink || '',
-                images: row.images || row['Image'] || row['Images'] || row.image || ''
+                images: row.images || row['Image'] || row['Images'] || row.image || '',
+                authors: row.authors || row['Author'] || row['Authors'] || row.author || ''
               }));
             
             cachedPapers = papers;
 
             console.log(`Successfully loaded ${papers.length} papers from Google Sheets`);
+            // Debug: Check if authors field is present in the first few papers
+            const firstPaper = papers[0];
+            if (firstPaper) {
+              console.log('First paper authors field:', firstPaper.authors);
+              console.log('Available fields:', Object.keys(firstPaper));
+            }
             resolve(papers);
           } catch (error) {
             console.error('Error processing CSV data:', error);
@@ -200,6 +215,47 @@ export function searchPapers(papers: Paper[], query: string): Paper[] {
     paper.content.toLowerCase().includes(lowercaseQuery) ||
     paper.id.toLowerCase().includes(lowercaseQuery)
   );
+}
+
+/**
+ * Parse authors string into array of author names
+ */
+export function parseAuthors(authorsString: string): string[] {
+  if (!authorsString || typeof authorsString !== 'string') {
+    return [];
+  }
+  
+  return authorsString
+    .split(',')
+    .map(author => author.trim())
+    .filter(author => author.length > 0);
+}
+
+/**
+ * Format authors for display in preview cards (limit with +X more)
+ */
+export function formatAuthorsForPreview(authorsString: string, maxAuthors: number = 2): { displayAuthors: string; remainingCount: number } {
+  const authors = parseAuthors(authorsString);
+  
+  if (authors.length === 0) {
+    return { displayAuthors: '', remainingCount: 0 };
+  }
+  
+  if (authors.length <= maxAuthors) {
+    return { displayAuthors: authors.join(', '), remainingCount: 0 };
+  }
+  
+  const displayAuthors = authors.slice(0, maxAuthors).join(', ');
+  const remainingCount = authors.length - maxAuthors;
+  
+  return { displayAuthors, remainingCount };
+}
+
+/**
+ * Get all authors as array for full page display
+ */
+export function getAllAuthors(authorsString: string): string[] {
+  return parseAuthors(authorsString);
 }
 
 /**

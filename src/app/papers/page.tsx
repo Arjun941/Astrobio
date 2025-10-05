@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { fetchPapersData, type Paper, searchPapers } from "@/lib/papers-data";
+import { fetchPapersData, type Paper, searchPapers, formatAuthorsForPreview } from "@/lib/papers-data";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +44,24 @@ export default function PapersPage() {
       return authorsMatch[1].trim();
     }
     return "Authors not specified";
+  };
+
+  const formatAuthorsDisplay = (paper: Paper): { displayText: string; hasMore: boolean } => {
+    // First try to use the authors field from the Google Sheets
+    if (paper.authors && paper.authors.trim()) {
+      const { displayAuthors, remainingCount } = formatAuthorsForPreview(paper.authors, 2);
+      return {
+        displayText: displayAuthors || "Authors not specified",
+        hasMore: remainingCount > 0
+      };
+    }
+    
+    // Fallback to extracting from content if authors field is not available
+    const fallbackAuthors = extractAuthorsFromContent(paper.content);
+    return {
+      displayText: fallbackAuthors,
+      hasMore: false
+    };
   };
 
   const extractPublicationYear = (content: string): string => {
@@ -181,11 +199,26 @@ export default function PapersPage() {
                 </CardTitle>
 
                 <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                  <div className="flex items-center space-x-1">
-                    <Users className="w-3 h-3" />
-                    <span className="line-clamp-1">{extractAuthorsFromContent(paper.content)}</span>
+                  <div className="flex items-center space-x-1 flex-1 min-w-0">
+                    <Users className="w-3 h-3 flex-shrink-0" />
+                    <span className="line-clamp-1 flex-1">
+                      {(() => {
+                        const { displayText, hasMore } = formatAuthorsDisplay(paper);
+                        const { remainingCount } = formatAuthorsForPreview(paper.authors || '', 2);
+                        return (
+                          <>
+                            {displayText}
+                            {hasMore && remainingCount > 0 && (
+                              <span className="text-accent font-medium ml-1">
+                                +{remainingCount} more
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1 flex-shrink-0">
                     <Calendar className="w-3 h-3" />
                     <span>{extractPublicationYear(paper.content)}</span>
                   </div>
