@@ -194,41 +194,56 @@ Research Paper URL: ${paperUrl}`,
 
     console.log(`📜 Generated script: ${narrationScript.length} characters`);
 
-    // Step 2: Convert script to audio using internal TTS API
+    // Step 2: Convert script to audio using Gemini TTS directly
     console.log('🎙️ Converting script to audio using Gemini TTS...');
     
     const ttsPrompt = `Read the following research paper narration in a clear, professional voice:
 
 ${narrationScript}`;
 
-    // Call our internal TTS API
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NEXTAUTH_URL 
-      ? process.env.NEXTAUTH_URL
-      : 'http://localhost:9002';
+    // Generate audio directly using Gemini TTS
+    const ttsGenAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     
-    const ttsResponse = await fetch(`${baseUrl}/api/audio-narration`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const ttsResponse = await ttsGenAI.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text: ttsPrompt }] }],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: voice },
+          },
+        },
       },
-      body: JSON.stringify({
-        text: ttsPrompt,
-        voice: voice
-      }),
     });
-
-    if (!ttsResponse.ok) {
-      const errorData = await ttsResponse.json();
-      throw new Error(`TTS API error: ${errorData.error}`);
-    }
-
-    const { audioDataUri } = await ttsResponse.json();
     
-    if (!audioDataUri) {
-      throw new Error('No audio data received from TTS API');
+    const audioData = ttsResponse.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    
+    if (!audioData) {
+      throw new Error('No audio data returned from Gemini TTS');
     }
+
+    // Convert PCM to WAV and create data URI
+    const pcmBuffer = Buffer.from(audioData, 'base64');
+    
+    // Create WAV header for 24kHz mono 16-bit audio
+    const wavHeader = Buffer.alloc(44);
+    wavHeader.write('RIFF', 0);
+    wavHeader.writeUInt32LE(36 + pcmBuffer.length, 4);
+    wavHeader.write('WAVE', 8);
+    wavHeader.write('fmt ', 12);
+    wavHeader.writeUInt32LE(16, 16);
+    wavHeader.writeUInt16LE(1, 20); // PCM
+    wavHeader.writeUInt16LE(1, 22); // Mono
+    wavHeader.writeUInt32LE(24000, 24); // Sample rate
+    wavHeader.writeUInt32LE(48000, 28); // Byte rate
+    wavHeader.writeUInt16LE(2, 32); // Block align
+    wavHeader.writeUInt16LE(16, 34); // Bits per sample
+    wavHeader.write('data', 36);
+    wavHeader.writeUInt32LE(pcmBuffer.length, 40);
+    
+    const wavBuffer = Buffer.concat([wavHeader, pcmBuffer]);
+    const audioDataUri = `data:audio/wav;base64,${wavBuffer.toString('base64')}`;
     
     console.log('✅ Audio narration generated successfully!');
     console.log(`   - Script length: ${narrationScript.length} characters`);
@@ -255,34 +270,50 @@ export async function generateAudioWithFallback(text: string, voice: string = 'P
   console.log('🎯 Using native Gemini TTS for direct audio generation...');
   
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NEXTAUTH_URL 
-      ? process.env.NEXTAUTH_URL
-      : 'http://localhost:9002';
+    // Generate audio directly using Gemini TTS
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     
-    const ttsResponse = await fetch(`${baseUrl}/api/audio-narration`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text }] }],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: voice },
+          },
+        },
       },
-      body: JSON.stringify({
-        text: text,
-        voice: voice
-      }),
     });
-
-    if (!ttsResponse.ok) {
-      const errorData = await ttsResponse.json();
-      throw new Error(`TTS API error: ${errorData.error}`);
-    }
-
-    const { audioDataUri } = await ttsResponse.json();
     
-    if (!audioDataUri) {
-      throw new Error('No audio data received from TTS API');
+    const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    
+    if (!audioData) {
+      throw new Error('No audio data returned from Gemini TTS');
     }
 
+    // Convert PCM to WAV and create data URI
+    const pcmBuffer = Buffer.from(audioData, 'base64');
+    
+    // Create WAV header for 24kHz mono 16-bit audio
+    const wavHeader = Buffer.alloc(44);
+    wavHeader.write('RIFF', 0);
+    wavHeader.writeUInt32LE(36 + pcmBuffer.length, 4);
+    wavHeader.write('WAVE', 8);
+    wavHeader.write('fmt ', 12);
+    wavHeader.writeUInt32LE(16, 16);
+    wavHeader.writeUInt16LE(1, 20); // PCM
+    wavHeader.writeUInt16LE(1, 22); // Mono
+    wavHeader.writeUInt32LE(24000, 24); // Sample rate
+    wavHeader.writeUInt32LE(48000, 28); // Byte rate
+    wavHeader.writeUInt16LE(2, 32); // Block align
+    wavHeader.writeUInt16LE(16, 34); // Bits per sample
+    wavHeader.write('data', 36);
+    wavHeader.writeUInt32LE(pcmBuffer.length, 40);
+    
+    const wavBuffer = Buffer.concat([wavHeader, pcmBuffer]);
+    const audioDataUri = `data:audio/wav;base64,${wavBuffer.toString('base64')}`;
+    
     return audioDataUri;
 
   } catch (error) {
