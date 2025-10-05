@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { fetchPapersData, type Paper } from "@/lib/papers-data";
+import { fetchPapersData, type Paper, processImageUrls } from "@/lib/papers-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SummaryView from "@/components/features/summary-view";
 import MindmapView from "@/components/features/mindmap-view";
@@ -8,6 +8,7 @@ import ChatbotView from "@/components/features/chatbot-view";
 import QuizView from "@/components/features/quiz-view";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { PaperImagesViewer } from "@/components/paper-images-viewer";
 import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
 import { PaperInteractions, PaperComments } from "@/components/paper-interactions-wrapper";
 
@@ -45,6 +46,7 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
   const authors = extractAuthorsFromContent(paper.content);
   const year = extractPublicationYear(paper.content);
   const doi = extractDOI(paper.content);
+  const imageUrls = processImageUrls(paper.images || '');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -87,8 +89,11 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <Tabs defaultValue="content" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-4">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4">
           <TabsTrigger value="content">Full Paper</TabsTrigger>
+          <TabsTrigger value="images">
+            Images ({imageUrls.length})
+          </TabsTrigger>
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="mindmap">Mindmap</TabsTrigger>
           <TabsTrigger value="audio">Audio</TabsTrigger>
@@ -108,6 +113,12 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
                 </p>
               </div>
             )}
+          </div>
+        </TabsContent>
+        <TabsContent value="images">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-2xl font-semibold mb-4">Research Images</h2>
+            <PaperImagesViewer imageUrls={imageUrls} paperTitle={paper.title} />
           </div>
         </TabsContent>
         <TabsContent value="summary">

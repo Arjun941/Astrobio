@@ -1,10 +1,89 @@
 'use server';
 
 /**
- * @fileOverview Generates audio narration using native Gemini TTS API
+ * @fileOveexport async function generateAudioNarration(input: AudioNarrationInput): Promise<AudioNarrationOutput> {
+  const { paperUrl, voice = 'Puck' } = input;
+
+  try {
+    console.log(`🎤 Generating audio narration from URL: ${paperUrl} with voice: ${voice}...`);
+
+    // Step 1: Generate the narration script using Gemini URL context tool
+    const promptText = `You are an expert science communicator creating an engaging audio narration for a research paper.
+
+I have provided you with access to a research paper web page. Please analyze the full content of this research paper and create a compelling audio narration script that:
+
+1. **Introduction** (30-45 seconds):
+   - Hook the listener with the significance of the research
+   - Introduce the main research question or problem
+   - Explain why this matters in the broader context
+
+2. **Methodology** (45-60 seconds):
+   - Explain the experimental approach in accessible terms
+   - Highlight key methods or innovative techniques used
+   - Mention important details about subjects, procedures, or data collection
+
+3. **Key Findings** (60-90 seconds):
+   - Present the main results clearly and engagingly
+   - Reference important figures, charts, or data when relevant
+   - Explain what the numbers and findings actually mean
+
+4. **Conclusions & Impact** (30-45 seconds):
+   - Summarize the key takeaways
+   - Explain broader implications for the field
+   - Mention potential future research directions or applications
+
+**Requirements:**
+- Write in a conversational, engaging tone suitable for audio
+- Use natural speech patterns with smooth transitions
+- Make complex concepts accessible without oversimplifying
+- Total length should be 3-4 minutes when spoken (approximately 450-600 words)
+- Include natural pauses and emphasis cues where appropriate
+- Reference specific findings from the paper's content and figures
+
+Please provide ONLY the narration script text, ready to be converted to speech.`;
+
+    const tools = [
+      { urlContext: {} },
+    ];
+    const config = {
+      thinkingConfig: {
+        thinkingBudget: -1,
+      },
+      tools,
+    };
+    const model = 'gemini-2.5-flash';
+    const contents = [
+      {
+        role: 'user',
+        parts: [
+          {
+            text: `${promptText}
+
+Research Paper URL: ${paperUrl}`,
+          },
+        ],
+      },
+    ];
+
+    const response = await ai.models.generateContentStream({
+      model,
+      config,
+      contents,
+    });
+
+    let narrationScript = '';
+    for await (const chunk of response) {
+      if (chunk.text) {
+        narrationScript += chunk.text;
+      }
+    }
+
+    if (!narrationScript || narrationScript.trim() === '') {
+      throw new Error('Empty narration script generated');
+    }o narration using Gemini URL context and TTS API
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 
 const AudioNarrationInputSchema = z.object({
@@ -26,8 +105,10 @@ const AudioNarrationOutputSchema = z.object({
 });
 export type AudioNarrationOutput = z.infer<typeof AudioNarrationOutputSchema>;
 
-// Initialize GoogleGenerativeAI for text generation 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+// Initialize Google GenAI
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
 export async function generateAudioNarration(input: AudioNarrationInput): Promise<AudioNarrationOutput> {
   const { paperUrl, voice = 'Puck' } = input;
@@ -35,25 +116,80 @@ export async function generateAudioNarration(input: AudioNarrationInput): Promis
   try {
     console.log(`🎤 Generating audio narration from URL: ${paperUrl} with voice: ${voice}...`);
 
-    // Step 1: Generate the narration script using regular Gemini
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    
-    const scriptPrompt = `Analyze the research paper from this URL and create a comprehensive narration that covers:
-    - Introduction to the topic and its significance
-    - Key methodology and approach
-    - Main findings and results
-    - Conclusions and implications
+    // Step 1: Generate the narration script using Gemini URL context tool
+    const promptText = `You are an expert science communicator creating an engaging audio narration for a research paper.
 
-    Make it clear, engaging, scientifically accurate, and about 2-3 minutes when spoken.
-    
-    URL: ${paperUrl}`;
+I have provided you with access to a research paper web page. Please analyze the full content of this research paper and create a compelling audio narration script that:
 
-    console.log('📝 Generating narration script...');
-    const scriptResult = await model.generateContent(scriptPrompt);
-    const narrationScript = scriptResult.response.text();
+1. **Introduction** (30-45 seconds):
+   - Hook the listener with the significance of the research
+   - Introduce the main research question or problem
+   - Explain why this matters in the broader context
+
+2. **Methodology** (45-60 seconds):
+   - Explain the experimental approach in accessible terms
+   - Highlight key methods or innovative techniques used
+   - Mention important details about subjects, procedures, or data collection
+
+3. **Key Findings** (60-90 seconds):
+   - Present the main results clearly and engagingly
+   - Reference important figures, charts, or data when relevant
+   - Explain what the numbers and findings actually mean
+
+4. **Conclusions & Impact** (30-45 seconds):
+   - Summarize the key takeaways
+   - Explain broader implications for the field
+   - Mention potential future research directions or applications
+
+**Requirements:**
+- Write in a conversational, engaging tone suitable for audio
+- Use natural speech patterns with smooth transitions
+- Make complex concepts accessible without oversimplifying
+- Total length should be 3-4 minutes when spoken (approximately 450-600 words)
+- Include natural pauses and emphasis cues where appropriate
+- Reference specific findings from the paper's content and figures
+
+Please provide ONLY the narration script text, ready to be converted to speech.`;
+
+    const tools = [
+      { urlContext: {} },
+    ];
+    const config = {
+      thinkingConfig: {
+        thinkingBudget: -1,
+      },
+      tools,
+    };
+    const model = 'gemini-2.5-flash';
+    const contents = [
+      {
+        role: 'user',
+        parts: [
+          {
+            text: `${promptText}
+
+Research Paper URL: ${paperUrl}`,
+          },
+        ],
+      },
+    ];
+
+    console.log('📝 Generating narration script using URL context...');
+    const response = await ai.models.generateContentStream({
+      model,
+      config,
+      contents,
+    });
+
+    let narrationScript = '';
+    for await (const chunk of response) {
+      if (chunk.text) {
+        narrationScript += chunk.text;
+      }
+    }
 
     if (!narrationScript || narrationScript.trim() === '') {
-      throw new Error('Failed to generate narration script');
+      throw new Error('Empty narration script generated');
     }
 
     console.log(`📜 Generated script: ${narrationScript.length} characters`);
@@ -99,10 +235,10 @@ ${narrationScript}`;
     };
 
   } catch (error) {
-    console.error('❌ Error generating Gemini audio narration:', error);
+    console.error('❌ Error generating audio narration:', error);
     
     if (error instanceof Error) {
-      throw new Error(`Failed to generate audio narration with Gemini TTS: ${error.message}`);
+      throw new Error(`Failed to generate audio narration: ${error.message}`);
     }
     throw new Error('Failed to generate audio narration: Unknown error');
   }
