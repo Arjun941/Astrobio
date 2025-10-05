@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { fetchPapersData, type Paper, processImageUrls } from "@/lib/papers-data";
+import { fetchPapersData, type Paper, processImageUrls, getAllAuthors } from "@/lib/papers-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SummaryView from "@/components/features/summary-view";
 import MindmapView from "@/components/features/mindmap-view";
@@ -25,6 +25,24 @@ function extractAuthorsFromContent(content: string): string {
   return "Authors not specified";
 }
 
+function getAuthorsDisplay(paper: Paper): { authorsList: string[]; authorsString: string } {
+  // First try to use the authors field from Google Sheets
+  if (paper.authors && paper.authors.trim()) {
+    const authorsList = getAllAuthors(paper.authors);
+    return {
+      authorsList,
+      authorsString: authorsList.join(', ')
+    };
+  }
+  
+  // Fallback to extracting from content
+  const fallbackAuthors = extractAuthorsFromContent(paper.content);
+  return {
+    authorsList: [fallbackAuthors],
+    authorsString: fallbackAuthors
+  };
+}
+
 function extractPublicationYear(content: string): string {
   const yearMatch = content.match(/(\d{4})/);
   return yearMatch ? yearMatch[1] : "N/A";
@@ -43,7 +61,7 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  const authors = extractAuthorsFromContent(paper.content);
+  const { authorsList, authorsString } = getAuthorsDisplay(paper);
   const year = extractPublicationYear(paper.content);
   const doi = extractDOI(paper.content);
   const imageUrls = processImageUrls(paper.images || '');
@@ -53,7 +71,11 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-headline font-bold mb-4">{paper.title}</h1>
         <div className="flex flex-col gap-4 text-muted-foreground">
-          <p>{authors} - {year}</p>
+          <div className="space-y-2">
+            <p className="font-medium">Authors:</p>
+            <p className="text-sm leading-relaxed">{authorsString}</p>
+            <p className="text-sm">Published: {year}</p>
+          </div>
           {doi && (
             <p className="text-sm">DOI: {doi}</p>
           )}
