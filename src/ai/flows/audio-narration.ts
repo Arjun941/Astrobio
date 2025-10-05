@@ -156,7 +156,7 @@ Please provide ONLY the narration script text, ready to be converted to speech.`
     ];
     const config = {
       thinkingConfig: {
-        thinkingBudget: -1,
+        thinkingBudget: -1, 
       },
       tools,
     };
