@@ -25,7 +25,7 @@ const teamMembers = [
     name: 'Vaishakh VS',
     role: 'Developer',
     image: 'https://media.licdn.com/dms/image/v2/D4D03AQFi08eH35Jx9Q/profile-displayphoto-scale_400_400/B4DZi9oioAHYAw-/0/1755528180156?e=1762387200&v=beta&t=Lz3jRQ_iEjiCs3kNi1FRrgI_GOoULGILetAD1e6BJlg',
-    linkedin: 'https://www.linkedin.com/in/vaishakh-vs'
+    linkedin: 'https://www.linkedin.com/in/vaishakh-v-s?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3B45lk7CtqR%2B6VojGpjIA92w%3D%3D'
   },
   {
     name: 'Hithesh G',
