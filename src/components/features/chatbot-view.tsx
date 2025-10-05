@@ -77,8 +77,8 @@ export default function ChatbotView({ paperUrl }: { paperUrl: string }) {
                 <Avatar className="w-8 h-8 border-2 border-primary">
                     <AvatarFallback className="bg-primary"><BotIcon /></AvatarFallback>
                 </Avatar>
-                <div className="rounded-lg bg-muted p-3 max-w-[85%]">
-                    <p className="text-sm">Hello! Ask me anything about this research paper.</p>
+                <div className="rounded-lg bg-muted p-3 max-w-[85%] min-w-0 break-words overflow-hidden">
+                    <p className="text-sm break-words">Hello! Ask me anything about this research paper.</p>
                 </div>
             </div>
             {messages.map((message, index) => (
@@ -96,18 +96,18 @@ export default function ChatbotView({ paperUrl }: { paperUrl: string }) {
                 )}
                 <div
                   className={cn(
-                    "rounded-lg p-3 max-w-[85%]",
+                    "rounded-lg p-3 max-w-[85%] min-w-0 break-words overflow-hidden",
                     message.sender === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   )}
                 >
                   {message.sender === 'bot' ? (
-                    <div className="text-sm">
-                      <MarkdownRenderer content={message.text} className="prose-sm" />
+                    <div className="text-sm overflow-hidden">
+                      <MarkdownRenderer content={message.text} className="prose-sm break-words overflow-hidden" />
                     </div>
                   ) : (
-                    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.text}</p>
                   )}
                 </div>
                  {message.sender === 'user' && (
@@ -122,7 +122,7 @@ export default function ChatbotView({ paperUrl }: { paperUrl: string }) {
                  <Avatar className="w-8 h-8 border-2 border-primary">
                     <AvatarFallback className="bg-primary"><BotIcon /></AvatarFallback>
                 </Avatar>
-                <div className="rounded-lg bg-muted p-3">
+                <div className="rounded-lg bg-muted p-3 min-w-0">
                   <div className="flex items-center space-x-2">
                     <span className="h-2 w-2 bg-primary rounded-full animate-pulse [animation-delay:-0.3s]"></span>
                     <span className="h-2 w-2 bg-primary rounded-full animate-pulse [animation-delay:-0.15s]"></span>

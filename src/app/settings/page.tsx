@@ -47,7 +47,6 @@ interface UserPreferences {
     updates: boolean
   }
   display: {
-    theme: 'light' | 'dark' | 'system'
     language: string
     compactView: boolean
   }
@@ -88,7 +87,6 @@ export default function SettingsPage() {
       updates: false
     },
     display: {
-      theme: 'system',
       language: 'en',
       compactView: false
     },

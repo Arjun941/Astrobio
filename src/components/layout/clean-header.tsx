@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Menu, X, Atom, User, LogOut, Settings, Star } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Menu, X, Atom, User, LogOut, Settings, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -20,7 +19,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export function CleanHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
   const { user, userProfile } = useAuth();
   const pathname = usePathname();
 
@@ -197,41 +195,7 @@ export function CleanHeader() {
               </motion.div>
             )}
 
-            {mounted && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.5 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="h-9 w-9 relative overflow-hidden group"
-                >
-                  <motion.div
-                    key={theme}
-                    initial={{ rotate: -180, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 180, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {theme === "dark" ? (
-                      <Sun className="h-4 w-4" />
-                    ) : (
-                      <Moon className="h-4 w-4" />
-                    )}
-                  </motion.div>
-                  <motion.div
-                    className="absolute inset-0 bg-accent/10 rounded-md"
-                    initial={{ scale: 0 }}
-                    whileHover={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </motion.div>
-            )}
+
 
             {/* Mobile menu toggle */}
             <Button

@@ -6,8 +6,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { 
   Telescope, 
-  Moon, 
-  Sun, 
   Menu, 
   X, 
   Globe, 
@@ -15,7 +13,6 @@ import {
   Microscope,
   Rocket
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
 const floatingIcons = [
   { Icon: Telescope, delay: 0 },
@@ -28,7 +25,6 @@ const floatingIcons = [
 export function AnimatedHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -135,38 +131,7 @@ export function AnimatedHeader() {
 
           {/* Theme toggle and mobile menu */}
           <div className="flex items-center space-x-2">
-            {mounted && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="relative overflow-hidden group"
-                >
-                  <motion.div
-                    initial={{ rotate: 0 }}
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {theme === "dark" ? (
-                      <Sun className="w-5 h-5" />
-                    ) : (
-                      <Moon className="w-5 h-5" />
-                    )}
-                  </motion.div>
-                  <motion.div
-                    className="absolute inset-0 bg-accent/20 rounded-full"
-                    initial={{ scale: 0 }}
-                    whileHover={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </Button>
-              </motion.div>
-            )}
+
 
             {/* Mobile menu toggle */}
             <div className="md:hidden">
