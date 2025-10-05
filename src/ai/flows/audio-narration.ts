@@ -202,7 +202,13 @@ Research Paper URL: ${paperUrl}`,
 ${narrationScript}`;
 
     // Call our internal TTS API
-    const ttsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:9002'}/api/audio-narration`, {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXTAUTH_URL 
+      ? process.env.NEXTAUTH_URL
+      : 'http://localhost:9002';
+    
+    const ttsResponse = await fetch(`${baseUrl}/api/audio-narration`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -249,7 +255,13 @@ export async function generateAudioWithFallback(text: string, voice: string = 'P
   console.log('🎯 Using native Gemini TTS for direct audio generation...');
   
   try {
-    const ttsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:9002'}/api/audio-narration`, {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXTAUTH_URL 
+      ? process.env.NEXTAUTH_URL
+      : 'http://localhost:9002';
+    
+    const ttsResponse = await fetch(`${baseUrl}/api/audio-narration`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
