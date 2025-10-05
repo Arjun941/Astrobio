@@ -15,6 +15,8 @@ export default function PapersPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const papersPerPage = 12;
 
   useEffect(() => {
     const loadPapers = async () => {
@@ -30,13 +32,25 @@ export default function PapersPage() {
     loadPapers();
   }, []);
 
-  // Filter papers based on search query
-  const filteredPapers = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return papers.slice(0, 50); // Show first 50 papers when no search
-    }
-    return searchPapers(papers, searchQuery);
-  }, [papers, searchQuery]);
+  // Filter papers based on search query and pagination
+  const { paginatedPapers, totalPages, totalResults } = useMemo(() => {
+    const filtered = searchQuery.trim() 
+      ? searchPapers(papers, searchQuery)
+      : papers;
+    
+    const totalResults = filtered.length;
+    const totalPages = Math.ceil(totalResults / papersPerPage);
+    const startIndex = (currentPage - 1) * papersPerPage;
+    const paginatedPapers = filtered.slice(startIndex, startIndex + papersPerPage);
+    
+    return { paginatedPapers, totalPages, totalResults };
+  }, [papers, searchQuery, currentPage, papersPerPage]);
+
+  // Reset to page 1 when search query changes
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
 
   const extractAuthorsFromContent = (content: string): string => {
     const authorsMatch = content.match(/AUTHORS:\s*(.+?)(?:\n|$)/i);
@@ -121,7 +135,7 @@ export default function PapersPage() {
         
         {/* Search Component */}
         <PapersSearch 
-          onSearch={setSearchQuery}
+          onSearch={handleSearch}
           placeholder="Search through 600+ research papers..."
         />
         
@@ -129,29 +143,12 @@ export default function PapersPage() {
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Search className="h-4 w-4" />
           {searchQuery ? (
-            <span>Found {filteredPapers.length} paper{filteredPapers.length !== 1 ? 's' : ''} for "{searchQuery}"</span>
+            <span>Found {totalResults} paper{totalResults !== 1 ? 's' : ''} for "{searchQuery}"</span>
           ) : (
-            <span>Showing {Math.min(papers.length, 50)} of {papers.length} available papers</span>
+            <span>Showing {paginatedPapers.length} of {papers.length} research papers (Page {currentPage} of {totalPages})</span>
           )}
         </div>
       </motion.div>
-      
-      {/* Suggested Papers Heading */}
-      {!searchQuery && (
-        <motion.div
-          className="text-center mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <h2 className="text-xl font-semibold text-foreground mb-2">
-            Suggested Papers
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            A curated selection from our extensive collection of {papers.length}+ research papers
-          </p>
-        </motion.div>
-      )}
 
       <motion.div 
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -159,7 +156,7 @@ export default function PapersPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        {filteredPapers.map((paper, index) => {
+        {paginatedPapers.map((paper, index) => {
 
           return (
             <motion.div
@@ -284,8 +281,68 @@ export default function PapersPage() {
         })}
       </motion.div>
 
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <motion.div 
+          className="flex justify-center items-center gap-2 mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="hover:bg-accent/10 hover:border-accent/30"
+          >
+            Previous
+          </Button>
+          
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={currentPage === pageNum 
+                    ? "bg-accent text-accent-foreground" 
+                    : "hover:bg-accent/10 hover:border-accent/30"
+                  }
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="hover:bg-accent/10 hover:border-accent/30"
+          >
+            Next
+          </Button>
+        </motion.div>
+      )}
+
       {/* No Results Message */}
-      {searchQuery && filteredPapers.length === 0 && (
+      {searchQuery && totalResults === 0 && (
         <motion.div 
           className="text-center py-12"
           initial={{ opacity: 0 }}
