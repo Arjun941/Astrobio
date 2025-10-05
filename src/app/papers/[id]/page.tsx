@@ -89,16 +89,28 @@ export default async function PaperDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <Tabs defaultValue="content" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4">
-          <TabsTrigger value="content">Full Paper</TabsTrigger>
-          <TabsTrigger value="images">
+        <TabsList className="w-full justify-start overflow-x-auto scrollbar-hide mb-4 h-auto flex-nowrap p-1 gap-1">
+          <TabsTrigger value="content" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Full Paper
+          </TabsTrigger>
+          <TabsTrigger value="images" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
             Images ({imageUrls.length})
           </TabsTrigger>
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="mindmap">Mindmap</TabsTrigger>
-          <TabsTrigger value="audio">Audio</TabsTrigger>
-          <TabsTrigger value="chatbot">Chatbot</TabsTrigger>
-          <TabsTrigger value="quiz">Quiz</TabsTrigger>
+          <TabsTrigger value="summary" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Summary
+          </TabsTrigger>
+          <TabsTrigger value="mindmap" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Mindmap
+          </TabsTrigger>
+          <TabsTrigger value="audio" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Audio
+          </TabsTrigger>
+          <TabsTrigger value="chatbot" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Chatbot
+          </TabsTrigger>
+          <TabsTrigger value="quiz" className="whitespace-nowrap px-4 py-2.5 text-sm min-w-fit shrink-0">
+            Quiz
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="content">
           <div className="bg-card rounded-lg border p-6">

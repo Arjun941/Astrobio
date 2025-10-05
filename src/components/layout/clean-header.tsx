@@ -31,8 +31,9 @@ export function CleanHeader() {
   const navItems = [
     { name: "Home", href: "/" },
     { name: "Papers", href: "/papers" },
-    { name: "Upload", href: "/upload" },
+    { name: "AI Reference", href: "/upload" },
     ...(user ? [{ name: "Starred", href: "/starred" }] : []),
+    { name: "Team", href: "/team" },
   ];
 
   return (
