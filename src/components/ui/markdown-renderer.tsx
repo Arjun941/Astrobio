@@ -11,21 +11,27 @@ interface MarkdownRendererProps {
 }
 
 export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
+  // Pre-process content to clean up formatting
+  const processedContent = content
+    .replace(/^BODY SECTIONS$/gm, '') // Remove "BODY SECTIONS" lines
+    .replace(/\n\n\n+/g, '\n\n') // Clean up excessive line breaks
+    .trim();
+
   return (
     <div className={`prose prose-slate dark:prose-invert max-w-none ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
         components={{
-          // Customize heading styles
+          // Customize heading styles - all same size for uniform appearance
           h1: ({ children }) => (
-            <h1 className="text-3xl font-bold mb-4 text-foreground">{children}</h1>
+            <h1 className="text-xl font-semibold mb-4 mt-6 text-foreground border-b border-border pb-2">{children}</h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-2xl font-semibold mb-3 text-foreground">{children}</h2>
+            <h2 className="text-xl font-semibold mb-4 mt-6 text-foreground border-b border-border pb-2">{children}</h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-xl font-medium mb-2 text-foreground">{children}</h3>
+            <h3 className="text-xl font-semibold mb-4 mt-6 text-foreground border-b border-border pb-2">{children}</h3>
           ),
           // Customize paragraph styles
           p: ({ children }) => (

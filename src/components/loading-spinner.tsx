@@ -10,7 +10,7 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ className, size = 48, text }: LoadingSpinnerProps) {
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center space-y-4 bg-background">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ 

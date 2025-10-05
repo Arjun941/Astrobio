@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, BrainCircuit, AudioWaveform, FileQuestion, MessageCircle, ArrowRight, Upload, Search } from 'lucide-react';
+import { BookOpen, BrainCircuit, AudioWaveform, FileQuestion, MessageCircle, ArrowRight, Upload, Search, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ShootingStars } from '@/components/ui/shooting-stars';
 import { StarsBackground } from '@/components/ui/stars-background';
@@ -38,7 +38,6 @@ const features = [
     icon: <Upload className="w-6 h-6" />,
     title: 'PDF Cross-Reference',
     description: 'Upload your research PDFs and discover related papers, citations, and cross-references using AI.',
-    isNew: true,
   },
 ];
 
@@ -47,7 +46,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative w-full py-20 md:py-32 lg:py-40 overflow-hidden bg-black/5 dark:bg-black/20">
+        <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-black/5 dark:bg-black/20">
           {/* Animated Background */}
           <div className="absolute inset-0 w-full h-full">
             <StarsBackground 
@@ -56,29 +55,46 @@ export default function Home() {
               maxTwinkleSpeed={0.8}
             />
             <ShootingStars 
-              minSpeed={6}
-              maxSpeed={16}
-              minDelay={800}
-              maxDelay={3000}
+              minSpeed={8}
+              maxSpeed={20}
+              minDelay={400}
+              maxDelay={1500}
               starColor="#22c55e"
               trailColor="#16a34a"
             />
           </div>
           
-          <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
+          <div className="container mx-auto px-4 md:px-6 text-center relative z-10 flex flex-col items-center justify-center min-h-full">
             <motion.h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white via-accent/90 to-white bg-clip-text text-transparent drop-shadow-2xl leading-tight py-2"
+              style={{ 
+                textShadow: '0 0 40px rgba(34, 197, 94, 0.3), 0 0 80px rgba(34, 197, 94, 0.1)',
+                filter: 'drop-shadow(0 4px 20px rgba(34, 197, 94, 0.2))'
+              }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 1, 
+                ease: [0.25, 0.46, 0.45, 0.94],
+                type: "spring",
+                stiffness: 100,
+                damping: 15
+              }}
             >
               AstroBio Navigator
             </motion.h1>
             <motion.p 
-              className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              className="mt-4 max-w-3xl mx-auto text-xl md:text-2xl lg:text-3xl text-muted-foreground"
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 0.9, 
+                delay: 0.3, 
+                ease: [0.25, 0.46, 0.45, 0.94],
+                type: "spring",
+                stiffness: 120,
+                damping: 20
+              }}
             >
               Unlock the secrets of space biology. Your AI-powered guide to complex research papers with interactive summaries and insights.
             </motion.p>
@@ -130,24 +146,10 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Button asChild variant="outline" size="lg" className="border-accent/30 hover:border-accent hover:bg-accent/10 text-foreground group relative overflow-hidden">
+                <Button asChild variant="outline" size="lg" className="border-accent/30 hover:border-accent hover:bg-accent/10 hover:text-accent text-foreground group relative overflow-hidden transition-all duration-300">
                   <Link href="/upload" className="inline-flex items-center px-6 py-3">
                     <Upload className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                    <span className="font-semibold">Upload PDF</span>
-                    <motion.div 
-                      className="ml-1 px-2 py-0.5 bg-accent text-accent-foreground text-xs rounded-full"
-                      animate={{ 
-                        scale: [1, 1.1, 1],
-                        opacity: [0.7, 1, 0.7]
-                      }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
-                        ease: "easeInOut" 
-                      }}
-                    >
-                      NEW
-                    </motion.div>
+                    <span className="font-semibold transition-colors duration-300">Upload PDF</span>
                   </Link>
                 </Button>
               </motion.div>
@@ -177,10 +179,37 @@ export default function Home() {
               />
             ))}
           </div>
+
+          {/* Scroll Indicator */}
+          <motion.div 
+            className="absolute bottom-20 w-full flex justify-center z-20"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.2 }}
+          >
+            <div className="flex flex-col items-center">
+            <span className="text-sm text-muted-foreground mb-2 hidden md:block">Scroll to explore</span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="p-2 rounded-full border border-accent/30 bg-background/10 backdrop-blur-sm hover:bg-accent/10 hover:border-accent/50 transition-colors duration-300 cursor-pointer"
+              onClick={() => {
+                const featuresSection = document.querySelector('#features-section');
+                featuresSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <ChevronDown className="w-5 h-5 text-accent" />
+            </motion.div>
+            </div>
+          </motion.div>
         </section>
 
         {/* Features Section */}
-        <section className="w-full py-16 md:py-24 bg-muted/30 relative">
+        <section id="features-section" className="w-full py-16 md:py-24 bg-muted/30 relative">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div 
               className="text-center mb-12"
@@ -196,7 +225,7 @@ export default function Home() {
                 We use cutting-edge AI to make dense scientific literature accessible to everyone.
               </p>
             </motion.div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
@@ -208,75 +237,28 @@ export default function Home() {
                     ease: "easeOut"
                   }}
                   viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className="group relative"
+                  className="h-full relative z-10"
                 >
-                  <Card className={`border-0 shadow-sm hover:shadow-2xl transition-all duration-500 h-full bg-background/50 backdrop-blur-sm hover:bg-background/90 relative overflow-hidden ${feature.isNew ? 'ring-2 ring-accent/20 hover:ring-accent/40' : ''}`}>
-                    {/* New Feature Badge */}
-                    {feature.isNew && (
-                      <motion.div 
-                        className="absolute top-4 right-4 bg-accent text-accent-foreground text-xs font-bold px-2 py-1 rounded-full"
-                        initial={{ scale: 0, rotate: -45 }}
-                        whileInView={{ scale: 1, rotate: 0 }}
-                        transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        NEW
-                      </motion.div>
-                    )}
-                    
+                  <Card className="h-full flex flex-col transition-all duration-300 border border-transparent cursor-pointer hover:-translate-y-1 hover:bg-accent/5 hover:border-accent/50 group" style={{ boxShadow: 'none' }}>
+                    <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: '0 0 15px 3px rgba(34, 197, 94, 0.12)' }} />
                     <CardHeader className="pb-4 relative z-10">
-                      <motion.div 
-                        className={`mb-3 p-3 w-fit rounded-xl ${feature.isNew ? 'bg-accent/20' : 'bg-accent/10'} group-hover:bg-accent/30 transition-colors duration-300`}
-                        whileHover={{ scale: 1.1, rotate: 10 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
-                        <motion.div
-                          whileHover={{ rotateY: 180 }}
-                          transition={{ duration: 0.6 }}
-                        >
+                      <div className="mb-3 p-3 w-fit rounded-xl bg-accent/10 group-hover:bg-accent/20 group-hover:scale-105 group-hover:ring-2 group-hover:ring-accent/30 transition-all duration-300">
+                        <div className="text-accent group-hover:text-accent transition-colors duration-300">
                           {feature.icon}
-                        </motion.div>
-                      </motion.div>
-                      <CardTitle className={`text-xl group-hover:text-accent transition-colors duration-300 ${feature.isNew ? 'text-accent' : ''}`}>
+                        </div>
+                      </div>
+                      <CardTitle className="text-xl group-hover:text-accent transition-colors duration-300 font-semibold">
                         {feature.title}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="relative z-10">
-                      <CardDescription className="text-sm leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
+                    <CardContent className="flex-1">
+                      <CardDescription className="text-muted-foreground text-sm leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
                         {feature.description}
                       </CardDescription>
                     </CardContent>
                     
-                    {/* Enhanced hover effect overlay */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                      initial={false}
-                    />
-                    
-                    {/* Shimmer effect on hover */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: "200%" }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
-                    />
-                    
-                    {/* Pulse effect for new feature */}
-                    {feature.isNew && (
-                      <motion.div
-                        className="absolute inset-0 rounded-lg border-2 border-accent/30"
-                        animate={{ 
-                          scale: [1, 1.02, 1],
-                          opacity: [0.3, 0.1, 0.3]
-                        }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity, 
-                          ease: "easeInOut" 
-                        }}
-                      />
-                    )}
+                    {/* Subtle glow effect */}
+                    <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-accent/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   </Card>
                 </motion.div>
               ))}
@@ -284,8 +266,8 @@ export default function Home() {
           </div>
 
           {/* Background pattern */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0" style={{
+          <div className="absolute inset-0 opacity-30 pointer-events-none -z-10">
+            <div className="absolute inset-0 pointer-events-none" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322c55e' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }} />
           </div>

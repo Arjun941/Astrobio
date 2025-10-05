@@ -6,6 +6,7 @@ export interface Paper {
   link: string;
   content: string;
   pdfLink: string;
+  images?: string;
 }
 
 // Google Sheets CSV URL - converted from the sharing link
@@ -13,6 +14,8 @@ const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bUYDRHaBe
 
 // Cache for papers data
 let cachedPapers: Paper[] | null = null;
+
+
 
 /**
  * Fetches papers data from Google Sheets CSV
@@ -49,7 +52,11 @@ export async function fetchPapersData(): Promise<Paper[]> {
             'Link': 'link', 
             'id': 'id',
             'content': 'content',
-            'PDF Link': 'pdfLink'
+            'PDF Link': 'pdfLink',
+            'Image': 'images',
+            'Images': 'images',
+            'image': 'images',
+            'images': 'images'
           };
           return headerMap[header] || header.toLowerCase();
         },
@@ -68,10 +75,12 @@ export async function fetchPapersData(): Promise<Paper[]> {
                 title: row.title || 'Untitled',
                 link: row.link || '',
                 content: row.content || '',
-                pdfLink: row.pdfLink || row['PDF Link'] || row.pdflink || ''
+                pdfLink: row.pdfLink || row['PDF Link'] || row.pdflink || '',
+                images: row.images || row['Image'] || row['Images'] || row.image || ''
               }));
             
             cachedPapers = papers;
+
             console.log(`Successfully loaded ${papers.length} papers from Google Sheets`);
             resolve(papers);
           } catch (error) {
@@ -90,6 +99,53 @@ export async function fetchPapersData(): Promise<Paper[]> {
     // Return fallback data from the local CSV if Google Sheets fails
     return getFallbackData();
   }
+}
+
+/**
+ * Processes images string and extracts JPG image URLs
+ */
+export function processImageUrls(imagesString: string): string[] {
+  if (!imagesString || typeof imagesString !== 'string') {
+    return [];
+  }
+  
+  // Split by " : " (space-colon-space) as found in the data format
+  let allUrls: string[] = [];
+  
+  if (imagesString.includes(' : ')) {
+    allUrls = imagesString.split(' : ');
+  } else if (imagesString.includes(': ')) {
+    allUrls = imagesString.split(': ');
+  } else {
+    allUrls = imagesString.split(':');
+  }
+  
+  // Clean URLs and filter for HTTP URLs
+  allUrls = allUrls
+    .map(url => url.trim())
+    .filter(url => url.length > 0 && url.startsWith('http'));
+  
+  // Filter for JPG/JPEG URLs
+  const jpgUrls = allUrls.filter(url => /\.(jpg|jpeg)$/i.test(url));
+  
+  // Filter out non-research images and include research images
+  const researchImages = jpgUrls.filter(url => {
+    // Exclude flags, icons, logos, SVG data URLs
+    if (url.includes('flag') || url.includes('icon') || url.includes('logo') || url.includes('data:image/svg')) return false;
+    
+    // Include NCBI PMC blob URLs (research images)
+    if (url.includes('cdn.ncbi.nlm.nih.gov/pmc/blobs')) return true;
+    
+    // Include other research patterns
+    if (url.includes('pmc') || url.includes('pubmed')) return true;
+    
+    // Include figure patterns (g001.jpg, fig01.jpg, figure1.jpg)
+    if (url.match(/\.(g\d+|fig\d+|figure\d+)\.jpg$/i)) return true;
+    
+    return false;
+  });
+  
+  return researchImages;
 }
 
 /**

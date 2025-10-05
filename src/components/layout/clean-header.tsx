@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Menu, X, Atom, User, LogOut, Settings, Star } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -21,6 +22,7 @@ export function CleanHeader() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const { user, userProfile } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -61,27 +63,57 @@ export function CleanHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {navItems.map((item, index) => (
-              <motion.div
-                key={item.name}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}
-              >
-                <Link
-                  href={item.href}
-                  className="text-foreground/60 transition-colors hover:text-accent relative group"
+            {navItems.map((item, index) => {
+              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+              return (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 + 0.2, ease: "easeOut" }}
+                  className="relative"
                 >
-                  {item.name}
-                  <motion.div
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent"
-                    initial={{ scaleX: 0 }}
-                    whileHover={{ scaleX: 1 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    href={item.href}
+                    className={`transition-colors duration-200 relative group ${
+                      isActive 
+                        ? "text-accent font-medium" 
+                        : "text-foreground/70 hover:text-accent"
+                    }`}
+                  >
+                    <motion.span
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                    >
+                      {item.name}
+                    </motion.span>
+                    
+                    {/* Active underline */}
+                    {isActive && (
+                      <motion.div
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent"
+                        layoutId="activeUnderline"
+                        initial={false}
+                        transition={{
+                          duration: 0.3,
+                          ease: [0.25, 0.46, 0.45, 0.94]
+                        }}
+                      />
+                    )}
+                    
+                    {/* Hover underline for non-active items */}
+                    {!isActive && (
+                      <motion.div
+                        className="absolute -bottom-1 left-0 right-0 h-px bg-accent/60"
+                        initial={{ scaleX: 0, opacity: 0 }}
+                        whileHover={{ scaleX: 1, opacity: 1 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                      />
+                    )}
+                  </Link>
+                </motion.div>
+              );
+            })}
           </nav>
 
           {/* Profile, Theme toggle and mobile menu */}
@@ -228,22 +260,43 @@ export function CleanHeader() {
               transition={{ duration: 0.2 }}
             >
               <div className="px-2 pt-2 pb-3 space-y-1 border-t">
-                {navItems.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.1 }}
-                  >
-                    <Link
-                      href={item.href}
-                      className="block px-3 py-2 text-sm font-medium text-foreground/60 hover:text-accent hover:bg-accent/10 rounded-md transition-all"
-                      onClick={() => setIsMenuOpen(false)}
+                {navItems.map((item, index) => {
+                  const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+                  return (
+                    <motion.div
+                      key={item.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.25, delay: index * 0.05, ease: "easeOut" }}
+                      whileHover={{ x: 2 }}
                     >
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                ))}
+                      <Link
+                        href={item.href}
+                        className={`block px-3 py-2 text-sm font-medium transition-colors duration-200 relative ${
+                          isActive 
+                            ? "text-accent font-medium" 
+                            : "text-foreground/70 hover:text-accent"
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <motion.span
+                          whileTap={{ scale: 0.98 }}
+                          transition={{ duration: 0.1, ease: "easeOut" }}
+                        >
+                          {item.name}
+                        </motion.span>
+                        {isActive && (
+                          <motion.div
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 bg-accent rounded-r-full"
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: 1 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                          />
+                        )}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
               </div>
             </motion.div>
           )}

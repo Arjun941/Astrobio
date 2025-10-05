@@ -22,8 +22,8 @@ export default function AnimatedLoadingSpinner({
   }
 
   const colorClasses = {
-    primary: 'border-primary',
-    secondary: 'border-secondary',
+    primary: 'border-accent dark:border-accent',
+    secondary: 'border-secondary dark:border-secondary',
     white: 'border-white',
     muted: 'border-muted-foreground'
   }
